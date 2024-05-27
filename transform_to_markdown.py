@@ -74,22 +74,23 @@ def print_markdown_node(node: Node, indent: int, max_width: int, file):
     for child in node.children:
         print_markdown_node(child, indent + 2, max_width, file)
 
-def print_markdown():
-    with open(os.path.join(OUTPUT_DIR, 'output.md'), 'w') as f:
+def print_markdown(file_name):
+    with open(file_name, 'w') as f:
         f.write("# Cloud Delivery Excellence Analysis for <company_name_here>\n")
         f.write("\n")
         f.write("Items in this table map to the Cloud Delivery Excellence mind map.\n")
         f.write("\n")
         print_markdown_nodes(root_node, file=f)
 
-def print_csv():
-    print("Name,Comments")
-    print_csv_nodes(root_node)
+def print_csv(file_name):
+    with open(file_name, 'w') as f:
+        f.write("Name,Comments\n")
+        print_csv_nodes(root_node, file=f)
 
-def print_csv_nodes(node: Node, indent: int = 0):
-    print_csv_node(node, indent)
+def print_csv_nodes(node: Node, indent: int = 0, file=None):
+    print_csv_node(node, indent, file)
     for child in node.children:
-        print_csv_node(child, indent + 2)
+        print_csv_node(child, indent + 2, file)
 
 def print_csv_node(node: Node, indent: int, file):
     file.write(f"{' ' * indent}{node.name},\n")
@@ -103,11 +104,10 @@ def print_excel_nodes(node: Node, indent: int = 0, data=None):
     for child in node.children:
         print_excel_nodes(child, indent + 2, data)
     return data
-
-def print_excel():
+def print_excel(file_name):
     data = print_excel_nodes(root_node)
     df = pd.DataFrame(data)
-    writer = pd.ExcelWriter('output.xlsx', engine='xlsxwriter')
+    writer = pd.ExcelWriter(file_name, engine='xlsxwriter')
     df.to_excel(writer, index=False, sheet_name="Scorecard")
     workbook  = writer.book
     worksheet = writer.sheets['Scorecard']
@@ -125,12 +125,13 @@ def main():
     # force creating the output directory
     os.makedirs(OUTPUT_DIR, exist_ok=True)
 
+    filename = f"{OUTPUT_DIR}/cloud_delivery_excellence.{args.format}"
     if args.format == 'markdown':
-        print_markdown()
+        print_markdown(file_name=filename.replace('markdown', 'md'))
     elif args.format == 'csv':
-        print_csv()
+        print_csv(file_name=filename)
     elif args.format == 'excel':
-        print_excel()
+        print_excel(file_name=filename)
 
 if __name__ == '__main__':
     main()

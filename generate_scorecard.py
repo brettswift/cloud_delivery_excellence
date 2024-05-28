@@ -6,13 +6,14 @@ import os
 
 #  Using this script.
 # 1. Save the CSV file to the same directory as this script, with the name that matches the file being read below.
-# 2. Run this script using the command `python transform_to_markdown.py`
-# 3. The output will be printed to the console. You can redirect the output to a file using `python transform_to_markdown.py > cloud_delivery_excellence.md`
-# 4. when editing markdown tables, a vscode extension called "Markdown Table" will take care of formatting for you.
+# 2. Run this script using the command `python generate_scorecard.py`
+# 
+# Tip:  when editing markdown tables, a vscode extension called "Markdown Table" will take care of formatting for you.
+
 
 OUTPUT_DIR = 'output'
 # Read the CSV data
-with open('ServiceExcellence.csv', 'r') as f:
+with open('input.csv', 'r') as f:
     reader = csv.reader(f)
     next(reader)  # Skip the header row
     data = list(reader)

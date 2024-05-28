@@ -1,3 +1,5 @@
 .venv
 output
 .DS_Store
+.csv
+*.csv

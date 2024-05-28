@@ -97,6 +97,14 @@ def print_csv_node(node: Node, indent: int, file):
     for child in node.children:
         print_csv_node(child, indent + 2, file)
 
+def get_indent_color(indent: int) -> str:
+    if indent <= 2:
+        return "#D3D3D3"  # Medium Grey
+    elif indent <= 4:
+        return "#F0F0F0"  # Light Grey
+    else:
+        return '#FFFFFF'  # White
+
 def print_excel_nodes(node: Node, indent: int = 0, data=None):
     if data is None:
         data = []
@@ -104,6 +112,7 @@ def print_excel_nodes(node: Node, indent: int = 0, data=None):
     for child in node.children:
         print_excel_nodes(child, indent + 2, data)
     return data
+
 def print_excel(file_name):
     data = print_excel_nodes(root_node)
     df = pd.DataFrame(data)
@@ -111,10 +120,15 @@ def print_excel(file_name):
     df.to_excel(writer, index=False, sheet_name="Scorecard")
     workbook  = writer.book
     worksheet = writer.sheets['Scorecard']
+    for i, row in enumerate(data):
+        color = get_indent_color(len(row['Item']) - len(row['Item'].lstrip()))
+        format = workbook.add_format({'bg_color': color, 'border': 1})
+        worksheet.write(i+1, 0, row['Item'], format)
+        worksheet.write(i+1, 1, row['Comments'], format)
     worksheet.set_column('A:A', 30)  # Set width of column A
-    worksheet.set_column('B:B', 80)  # Set width of column B
+    comments_format = workbook.add_format({'text_wrap': True})
+    worksheet.set_column('B:B', 80, comments_format)  # Set width of column B and wrap text
     writer.close()
-
 
 def main():
     parser = argparse.ArgumentParser(description='Transform nodes to specified format.')
@@ -131,7 +145,7 @@ def main():
     elif args.format == 'csv':
         print_csv(file_name=filename)
     elif args.format == 'excel':
-        print_excel(file_name=filename)
+        print_excel(file_name=filename.replace('excel', 'xlsx'))
 
 if __name__ == '__main__':
     main()
